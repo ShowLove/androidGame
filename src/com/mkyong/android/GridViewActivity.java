@@ -58,7 +58,7 @@ public class GridViewActivity extends Activity {
 		,"Ground","Ground","Ground","Ground","Ground", "Ground"
 		,"Ground","Ground","Ground","Ground","Ground", "Ground"};
 	public static String[] MOBILE_tmp = new String[]  { "Ground" }; 
-	public static String[] sCharacters = new String[]  { "Hat",  "Pickaxe", "Wheelbarrow", "Cave"};          
+	public static String[] sCharacters = new String[]  { "Hat",  "Pickaxe", "Wheelbarrow", "Cave", "Pit"};          
 
 
 	private ImageAdapter myAdapter = new ImageAdapter(this, MOBILE_OS); 
@@ -112,7 +112,13 @@ public class GridViewActivity extends Activity {
 							, Toast.LENGTH_SHORT).show();	
 				}//move chosen character 
 				else{
-					if(validIndex(posTmp, position) == 1 && restrictHat(position) == 0){
+					if( hatDeath(position) == 1 ){
+		                newGame();
+		                updateGameBoard();
+		        		gridView.setAdapter(myAdapter);
+		        		initialClick = 1; 
+					}
+					else if(validIndex(posTmp, position) == 1 && restrictHat(position) == 0){
 						 switch ( keyPressed(position, posTmp) ) {
 				            case 0:  
 				                newGame();
@@ -433,11 +439,26 @@ public class GridViewActivity extends Activity {
 			return 1; 
 	}
 	
+	//if the hat goes in death thing 
+	public int hatDeath(int position){
+		if( MOBILE_tmp[0] == sCharacters[0]){
+			if( MOBILE_OS[position] == sCharacters[4]){
+				return 1; 
+			}
+		}
+		
+		return 0; 
+	}
 
 	//do not allow hat to move in pit. 
 	public int restrictHat(int position){
 		
 		if( MOBILE_tmp[0] == sCharacters[0]){
+			if( MOBILE_OS[position] == sCharacters[3]){
+				return 1; 
+			}
+		}
+		if( MOBILE_tmp[0] == sCharacters[2]){
 			if( MOBILE_OS[position] == sCharacters[3]){
 				return 1; 
 			}
