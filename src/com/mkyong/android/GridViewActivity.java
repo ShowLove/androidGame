@@ -58,7 +58,7 @@ public class GridViewActivity extends Activity {
 		,"Ground","Ground","Ground","Ground","Ground", "Ground"
 		,"Ground","Ground","Ground","Ground","Ground", "Ground"};
 	public static String[] MOBILE_tmp = new String[]  { "Ground" }; 
-	public static String[] sCharacters = new String[]  { "Hat",  "Pickaxe", "Wheelbarrow"};          
+	public static String[] sCharacters = new String[]  { "Hat",  "Pickaxe", "Wheelbarrow", "Cave"};          
 
 
 	private ImageAdapter myAdapter = new ImageAdapter(this, MOBILE_OS); 
@@ -93,8 +93,7 @@ public class GridViewActivity extends Activity {
 					int position, long id) {
 				row = returnRow(position); col = returnCol(position); 
 				
-				Toast.makeText(getApplicationContext(), "pos("+position+") :"
-						, Toast.LENGTH_SHORT).show();
+
 				if( initialClick == 1 ){//choose a character for the first time 
 					MOBILE_OS[0] = "Hat"; 
 					MOBILE_OS[65] = "Treasure"; 
@@ -113,7 +112,7 @@ public class GridViewActivity extends Activity {
 							, Toast.LENGTH_SHORT).show();	
 				}//move chosen character 
 				else{
-					if(validIndex(posTmp, position) == 1){
+					if(validIndex(posTmp, position) == 1 && restrictHat(position) == 0){
 						 switch ( keyPressed(position, posTmp) ) {
 				            case 0:  
 				                newGame();
@@ -245,40 +244,15 @@ public class GridViewActivity extends Activity {
                 
 	}//end of update gameBoard
 	
-	private int singleArrayPosition(int col, int row){
-		int newInt; 
-		newInt = 6*row + col ;
-		
-		return newInt; 
-	}	
+
 	
-	private int returnRow(int position){
-		return position/6; 
-	}
 	
-	private int returnCol(int position){
-		int row; 
-		row = returnRow(position); 
-		
-		return position - 6*row; 
-	}
-	
-	//returns 1 if valid, returns 0 if invalid; 
-	private int validIndex(int position1, int position2){
-		int row1, col1, row2, col2;
-		row1 = returnRow(position1); col1 = returnCol(position1); 
-		row2 = returnRow(position2); col2 = returnCol(position2); 
-		
-		if( Math.abs( row1 - row2 ) > 1 || Math.abs( col1 - col2) > 1)
-			return 0; 
-		else
-			return 1; 
-	}
 	
 	/*return 0	= invalid move or death of a character 
 	 * 		 1  = valid move 
 	 * 		 2  = portal jump 
-	 */
+	 * 			
+	 */		//sets up the java controlling the characters and gui 
 	public int keyPressed(int position, int tmpPos) {
 		
 		// Get the direction of movement.
@@ -428,11 +402,56 @@ public class GridViewActivity extends Activity {
 
 		return 1; 
 	}
+	
+	private int singleArrayPosition(int col, int row){
+		int newInt; 
+		newInt = 6*row + col ;
+		
+		return newInt; 
+	}	
+	
+	private int returnRow(int position){
+		return position/6; 
+	}
+	
+	private int returnCol(int position){
+		int row; 
+		row = returnRow(position); 
+		
+		return position - 6*row; 
+	}
+	
+	//returns 1 if valid, returns 0 if invalid; 
+	private int validIndex(int position1, int position2){
+		int row1, col1, row2, col2;
+		row1 = returnRow(position1); col1 = returnCol(position1); 
+		row2 = returnRow(position2); col2 = returnCol(position2); 
+		
+		if( Math.abs( row1 - row2 ) > 1 || Math.abs( col1 - col2) > 1)
+			return 0; 
+		else
+			return 1; 
+	}
+	
+
+	//do not allow hat to move in pit. 
+	public int restrictHat(int position){
+		
+		if( MOBILE_tmp[0] == sCharacters[0]){
+			if( MOBILE_OS[position] == sCharacters[3]){
+				return 1; 
+			}
+		}
+		
+		return 0; 
+	}
+	
 	/* returns 	0 = hat
 	 * 			1 = pickaxe
 	 * 			2 = wheelbarrow 
 	 * 			3 = other
-	 */
+	 * checks what character you selected on previous click 
+	 */ 
 	public int getSelected(){
 		if(MOBILE_tmp[0] == sCharacters[0])
 			return 0; 	
@@ -442,6 +461,8 @@ public class GridViewActivity extends Activity {
 			return 2; 
 		return 3; 
 	}
+	
+	//checks the character selected on most recent click 
 	public int checkIfValid(int position){
 		if(MOBILE_OS[position] == sCharacters[0])
 			return 0; 	
