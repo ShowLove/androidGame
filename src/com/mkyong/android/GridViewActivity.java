@@ -17,6 +17,7 @@ import android.widget.AdapterView.OnItemClickListener;
 /*	FIX BUGS
  * 	1. 	when i get treausure adventurer stays there
  *  2.	if i dont click on the right sequence it stops 
+ *  3.	just click on character once ...then move him that is all. 
  */
 
 
@@ -28,6 +29,7 @@ public class GridViewActivity extends Activity {
 	private Board gameBoard; // Underlying board game.
 	private List<Character> characters; // Characters on the board.
 	private int selected; // Which character is currently selected.
+	private int clickStatus = 4, initialClick = 1; 
 	private boolean treasureClaimed;
 	
     //ADDED, VARIABLES USED TO KEEP TRACK OF MOVES
@@ -85,28 +87,39 @@ public class GridViewActivity extends Activity {
 		gridView = (GridView) findViewById(R.id.gridView1);
 		gridView.setAdapter(myAdapter);
 
+
 		gridView.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View v,
 					int position, long id) {
 				row = returnRow(position); col = returnCol(position); 
-			/*	Toast.makeText(
-						getApplicationContext(),
-						((TextView) v.findViewById(R.id.grid_item_label))
-								.getText(), Toast.LENGTH_SHORT).show(); */
-				//Toast.makeText(getApplicationContext(), "Position("+position +")"+"clicks("+clickCount+")"
-				//			, Toast.LENGTH_SHORT).show();
-				//click what you want to move  
-				if( (int) clickCount == 0){
+				
+				Toast.makeText(getApplicationContext(), "pos("+position+") :"
+						, Toast.LENGTH_SHORT).show();
+				if( initialClick == 1 ){//choose a character for the first time 
+					MOBILE_OS[0] = "Hat"; 
+					MOBILE_OS[65] = "Treasure"; 
+					if(checkIfValid(position) < 3){
+						posTmp = position; 					//GUI
+						MOBILE_tmp[0] = MOBILE_OS[posTmp]; 	//GUI
+						initialClick = 0; 
+						Toast.makeText(getApplicationContext(), "Initial choice "+checkIfValid(position)
+								, Toast.LENGTH_SHORT).show();	
+					}
+				}//choose a new character 
+				else if(checkIfValid(position) < 3){
 					posTmp = position; 					//GUI
 					MOBILE_tmp[0] = MOBILE_OS[posTmp]; 	//GUI
-				}//move what you previously clicked 
-				else if( (int) clickCount == 1){
+					Toast.makeText(getApplicationContext(), "New choice "+checkIfValid(position)
+							, Toast.LENGTH_SHORT).show();	
+				}//move chosen character 
+				else{
 					if(validIndex(posTmp, position) == 1){
 						 switch ( keyPressed(position, posTmp) ) {
 				            case 0:  
 				                newGame();
 				                updateGameBoard();
 				        		gridView.setAdapter(myAdapter);
+				        		initialClick = 1; 
 				                     break;
 				            case 1:  
 				            	MOBILE_OS[posTmp] = "Ground"; 			//GUI
@@ -122,38 +135,15 @@ public class GridViewActivity extends Activity {
 				                     break;
 				        }		
 					}
-				
-				}//click what you want to move 
-				else if((int) (clickCount % 2 ) ==  0){
-					posTmp = position; 							//GUI
-					MOBILE_tmp[0] = MOBILE_OS[posTmp]; 			//GUI
-				}//move what you previously clicked 
-				else if( clickCount % 2 > 0 && clickCount > 0){
-					if(validIndex(posTmp, position) == 1){
-						 switch ( keyPressed(position, posTmp) ) {
-				            case 0:  
-				                newGame();
-				                updateGameBoard();
-				        		gridView.setAdapter(myAdapter);
-				                     break;
-				            case 1:  
-				            	MOBILE_OS[posTmp] = "Ground"; 			//GUI
-								MOBILE_OS[position] = MOBILE_tmp[0]; 	//GUI
-								gridView.setAdapter(myAdapter);			//GUI
-				                     break;
-				            case 2:  ;
-				            	MOBILE_OS[posTmp] = "Ground"; 			//GUI
-								MOBILE_OS[jumpPos] = MOBILE_tmp[0]; 	//GUI
-								gridView.setAdapter(myAdapter);			//GUI
-				                     break;
-				            default: ;
-				                     break;
-				        }		
-					}			
-				} 
-				clickCount++;
+					if( initialClick < 7){// only if we are not starting a new game
+						posTmp = position; 					//GUI
+						MOBILE_tmp[0] = MOBILE_OS[posTmp]; 	//GUI
+					}
 
-			}
+				}
+
+				clickCount++;
+			}//end of onItmeClick 
 		});//end of onClick..
 		
 
@@ -438,13 +428,26 @@ public class GridViewActivity extends Activity {
 
 		return 1; 
 	}
-	
+	/* returns 	0 = hat
+	 * 			1 = pickaxe
+	 * 			2 = wheelbarrow 
+	 * 			3 = other
+	 */
 	public int getSelected(){
 		if(MOBILE_tmp[0] == sCharacters[0])
 			return 0; 	
 		else if(MOBILE_tmp[0] == sCharacters[1])
 			return 1; 
 		else if(MOBILE_tmp[0] == sCharacters[2])
+			return 2; 
+		return 3; 
+	}
+	public int checkIfValid(int position){
+		if(MOBILE_OS[position] == sCharacters[0])
+			return 0; 	
+		else if(MOBILE_OS[position] == sCharacters[1])
+			return 1; 
+		else if(MOBILE_OS[position] == sCharacters[2])
 			return 2; 
 		return 3; 
 	}
